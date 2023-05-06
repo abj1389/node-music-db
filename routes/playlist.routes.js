@@ -1,7 +1,7 @@
 const express = require("express");
 
 // Modelos
-const { Sample } = require("../models/Sample.js");
+const { Playlist } = require("../models/Playlist.js");
 
 const router = express.Router();
 
@@ -11,19 +11,19 @@ router.get("/", async (req, res) => {
     // Asi leemos query params
     const page = parseInt(req.query.page);
     const limit = parseInt(req.query.limit);
-    const samples = await Sample.find()
+    const playlists = await Playlist.find()
       .limit(limit)
       .skip((page - 1) * limit)
-      .populate("child");
+      .populate(["songs", "user"]);
 
     // Num total de elementos
-    const totalElements = await Sample.countDocuments();
+    const totalElements = await Playlist.countDocuments();
 
     const response = {
       totalItems: totalElements,
       totalPages: Math.ceil(totalElements / limit),
       currentPage: page,
-      data: samples,
+      data: playlists,
     };
 
     res.json(response);
@@ -37,9 +37,9 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
   try {
     const id = req.params.id;
-    const sample = await Sample.findById(id).populate("child");
-    if (sample) {
-      res.json(sample);
+    const playlist = await Playlist.findById(id).populate(["songs", "user"]);
+    if (playlist) {
+      res.json(playlist);
     } else {
       res.status(404).json({});
     }
@@ -53,9 +53,9 @@ router.get("/title/:title", async (req, res) => {
   const title = req.params.title;
 
   try {
-    const sample = await Sample.find({ title: new RegExp("^" + title.toLowerCase(), "i") }).populate("child");
-    if (sample?.length) {
-      res.json(sample);
+    const playlist = await Playlist.find({ title: new RegExp("^" + title.toLowerCase(), "i") }).populate(["songs", "user"]);
+    if (playlist?.length) {
+      res.json(playlist);
     } else {
       res.status(404).json([]);
     }
@@ -67,16 +67,11 @@ router.get("/title/:title", async (req, res) => {
 
 // CRUD: CREATE
 router.post("/", async (req, res) => {
-  console.log(req.headers);
-
   try {
-    const sample = new Sample({
-      title: req.body.title,
-      subtitle: req.body.subtitle,
-    });
+    const playlist = new Playlist(req.body);
 
-    const createdSample = await sample.save();
-    return res.status(201).json(createdSample);
+    const createdPlaylist = await playlist.save();
+    return res.status(201).json(createdPlaylist);
   } catch (error) {
     console.error(error);
     res.status(500).json(error);
@@ -87,9 +82,9 @@ router.post("/", async (req, res) => {
 router.delete("/:id", async (req, res) => {
   try {
     const id = req.params.id;
-    const sampleDeleted = await Sample.findByIdAndDelete(id);
-    if (sampleDeleted) {
-      res.json(sampleDeleted);
+    const playlistDeleted = await Playlist.findByIdAndDelete(id);
+    if (playlistDeleted) {
+      res.json(playlistDeleted);
     } else {
       res.status(404).json({});
     }
@@ -103,9 +98,9 @@ router.delete("/:id", async (req, res) => {
 router.put("/:id", async (req, res) => {
   try {
     const id = req.params.id;
-    const sampleUpdated = await Sample.findByIdAndUpdate(id, req.body, { new: true });
-    if (sampleUpdated) {
-      res.json(sampleUpdated);
+    const playlistUpdated = await Playlist.findByIdAndUpdate(id, req.body, { new: true, runValidators: true });
+    if (playlistUpdated) {
+      res.json(playlistUpdated);
     } else {
       res.status(404).json({});
     }
@@ -115,4 +110,4 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-module.exports = { sampleRouter: router };
+module.exports = { playlistRouter: router };

@@ -1,31 +1,38 @@
 const express = require("express");
-const { sampleRouter } = require("./routes/sample.routes.js");
-const { subSampleRouter } = require("./routes/subsample.routes.js");
+const { userRouter } = require("./routes/user.routes.js");
+const { songRouter } = require("./routes/song.routes.js");
+const { artistRouter } = require("./routes/artist.routes.js");
+const { playlistRouter } = require("./routes/playlist.routes.js");
 
 // Conexión a la BBDD
-const { connect } = require("./db.js");
-connect();
+const main = async () => {
+  const { connect } = require("./db.js");
+  await connect();
 
-// Configuración del server
-const PORT = 3000;
-const server = express();
-server.use(express.json());
-server.use(express.urlencoded({ extended: false }));
+  // Configuración del server
+  const PORT = 3000;
+  const server = express();
+  server.use(express.json());
+  server.use(express.urlencoded({ extended: false }));
 
-// Rutas
-const router = express.Router();
-router.get("/", (req, res) => {
-  res.send("Esta es la home de nuestra API");
-});
-router.get("*", (req, res) => {
-  res.status(404).send("Lo sentimos :( No hemos encontrado la página solicitada.");
-});
+  // Rutas
+  const router = express.Router();
+  router.get("/", (req, res) => {
+    res.send("Esta es la home de nuestra API");
+  });
+  router.get("*", (req, res) => {
+    res.status(404).send("Lo sentimos :( No hemos encontrado la página solicitada.");
+  });
 
-// Usamos las rutas
-server.use("/sample", sampleRouter);
-server.use("/subsample", subSampleRouter);
-server.use("/", router);
+  // Usamos las rutas
+  server.use("/playlist", playlistRouter);
+  server.use("/artist", artistRouter);
+  server.use("/song", songRouter);
+  server.use("/user", userRouter);
+  server.use("/", router);
 
-server.listen(PORT, () => {
-  console.log(`Server levantado en el puerto ${PORT}`);
-});
+  server.listen(PORT, () => {
+    console.log(`Server levantado en el puerto ${PORT}`);
+  });
+};
+main();

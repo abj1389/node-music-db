@@ -9,7 +9,7 @@ const config = {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   serverSelectionTimeoutMS: 5000,
-  dbName: "sample-database",
+  dbName: process.env.DB_NAME,
 };
 
 const connect = async () => {

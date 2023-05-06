@@ -4,8 +4,13 @@
   "description": "Hola este es el repo de template",
   "main": "index.js",
   "scripts": {
-    "start": "node --watch index.js",
-    "seed:sample": "node ./seeds/sample.seed.js",
+    "start": "node index.js",
+    "start:watch": "node --watch index.js",
+    "seed:user": "node ./seeds/user.seed.js",
+    "seed:song": "node ./seeds/song.seed.js",
+    "seed:artist": "node ./seeds/artist.seed.js",
+    "seed:playlist": "node ./seeds/playlist.seed.js",
+    "seed:all": "npm run seed:user && npm run seed:artist && npm run seed:song && npm run seed:playlist",
     "lint": "eslint",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepare": "husky install"
@@ -21,6 +26,7 @@
   "dependencies": {
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
-    "mongoose": "^7.1.0"
+    "mongoose": "^7.1.0",
+    "validator": "^13.9.0"
   }
 }
